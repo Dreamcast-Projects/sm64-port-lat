@@ -27,6 +27,7 @@
 *.out
 *.app
 *.hex
+*.bin
 
 # Debug files
 *.dSYM/
@@ -49,6 +50,8 @@ build/*
 *.mio0
 *.z64
 *.map
+*.iso
+*.cdi
 .assets-local.txt
 sm64_save_file.bin
 sm64config.txt

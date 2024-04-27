@@ -13,7 +13,7 @@
 #define SCR_HEIGHT (480)
 
 static int force_30fps = 1;
-static unsigned int last_time = 0;
+static unsigned int frame_time = 0;
 
 extern void glKosSwapBuffers(void);
 extern uint64_t timer_ms_gettime64(void);
@@ -69,7 +69,7 @@ static void gfx_dc_init(UNUSED const char *game_name, UNUSED bool start_in_fulls
     setSystemRam();
 
     /* init */
-    last_time = GetSystemTimeLow();
+    frame_time = GetSystemTimeLow();
 }
 
 static void gfx_dc_set_fullscreen_changed_callback(UNUSED void (*on_fullscreen_changed)(bool is_now_fullscreen)) {
@@ -100,46 +100,31 @@ static void gfx_dc_handle_events(void) {
     // DelayThread(100);
 }
 
-float cpu_time = 0.f, gpu_time = 0.f;
-uint8_t skip_debounce = 0;
 const unsigned int FRAME_TIME_MS = 30; // hopefully get right on target @ 33.3
 
 static bool gfx_dc_start_frame(void) {
-    const unsigned int cur_time = GetSystemTimeLow();
-    const unsigned int elapsed = cur_time - last_time;
-
-    if (skip_debounce) {
-        skip_debounce--;
-        return true;
-    }
-    // skip if frame took longer than 1 / 30 = 33.3 ms
-    if (elapsed > FRAME_TIME_MS) {
-        skip_debounce = 3; // skip a max of once every 4 frames
-        last_time = cur_time;
-        return false;
-    }
     return true;
 }
 
 static void gfx_dc_swap_buffers_begin(void) {
+    glKosSwapBuffers();
 }
 
 static void gfx_dc_swap_buffers_end(void) {
     // Number of microseconds a frame should take (30 fps)
-    const unsigned int cur_time = GetSystemTimeLow();
-    const unsigned int elapsed = cur_time - last_time;
-    last_time = cur_time;
+    const unsigned int now = GetSystemTimeLow();
+    const unsigned int frame_length = now - frame_time;
 
-    if (force_30fps && elapsed < FRAME_TIME_MS) {
-#ifdef DEBUG
-        printf("elapsed %d ms fps %f delay %d \n", elapsed, 1000.0f / elapsed, FRAME_TIME_MS - elapsed);
-#endif
-        DelayThread(FRAME_TIME_MS - elapsed);
-        last_time += (FRAME_TIME_MS - elapsed);
+    if (frame_length < FRAME_TIME_MS) {
+        // Only sleep if we have time to spare
+        const double remain = FRAME_TIME_MS - frame_length;
+        // Sleep remaining time away
+        DelayThread(remain);
+        // Assume we slept the required amount of time to keep the timer stable
+        frame_time = now + remain;
+    } else {
+        frame_time = now;
     }
-
-    /* Lets us yield to other threads*/
-    glKosSwapBuffers();
 }
 
 /* Idk what this is for? */

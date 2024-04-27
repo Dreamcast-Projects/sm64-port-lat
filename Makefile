@@ -545,8 +545,8 @@ endif
 ifeq ($(TARGET_DC),1)
   #Notes from neo
   #-gdwarf-2 -gstrict-dwarf -g3 --ffunction-sections -fdata-sections -Wl,-gc-sections
-  PLATFORM_CFLAGS  := $(KOS_CFLAGS) -DTARGET_DC -DNDEBUG -Isrc/pc/gfx/gldc -Wall -Wextra -g3
-  PLATFORM_LDFLAGS := -Wl,--gc-sections  -Wl,-Map=output.map
+  PLATFORM_CFLAGS  := $(KOS_CFLAGS) -DTARGET_DC -DNDEBUG -Wall -Wextra -g3
+  PLATFORM_LDFLAGS := -Wl,-Map=output.map
 endif
 ifeq ($(TARGET_WEB),1)
   PLATFORM_CFLAGS  := -DTARGET_WEB
@@ -575,8 +575,7 @@ ifeq ($(ENABLE_OPENGL),1)
     GFX_LDFLAGS += -L$(PSPSDK_PREFIX)/lib src/pc/libME.a src/pc/gfx/libpspmath.a -lpspdebug  -lpspgu -lpspvfpu -lpspctrl -lpspge -lpspdisplay -lm -lpspsdk -lpsprtc -lpspaudio -lpsputility -lpspnet_inet -lpsppower -lc -lpspuser -lpspvram  
   endif
   ifeq ($(TARGET_DC),1)
-    GFX_CFLAGS  += -Isrc/pc/audio/aldc2
-    GFX_LDFLAGS += src/pc/gfx/gldc/libGLdc.a src/pc/audio/aldc2/libAL.a -lm
+    GFX_LDFLAGS += -lGL -lAL -lm
   endif
 endif
 ifeq ($(ENABLE_DX11),1)
@@ -953,6 +952,13 @@ ifeq ($(TARGET_DC),1)
 include $(KOS_BASE)/Makefile.rules
 elf: $(EXE)
 	sh-elf-objcopy -R .stack -O binary $< $<.bin
+
+mkdcdisc:
+	meson setup $(TOOLS_DIR)/mkdcdisc/build $(TOOLS_DIR)/mkdcdisc
+	meson compile -C $(TOOLS_DIR)/mkdcdisc/build
+
+cdi: mkdcdisc elf
+	$(TOOLS_DIR)/mkdcdisc/build/mkdcdisc -N -e $(EXE) -o $(BUILD_DIR)/$(TARGET).cdi
 
 scramble: elf
 	$(KOS_BASE)/utils/scramble/scramble $(EXE).bin $(BUILD_DIR)/1ST_READ.bin

@@ -75,11 +75,11 @@ Notes: Currently only supported building under linux and WSL
 ### Sega Dreamcast
 **Fixed textures live in the psp/textures/ folder. copy these into textures/, overwrite the extracted ones, and rebuild**
 
-1. Install the Dreamcast toolchain https://github.com/KallistiOS/KallistiOS/tree/master/utils/dc-chain.
-2. Install python3
+1. Install the Dreamcast toolchain https://dreamcast.wiki/Getting_Started_with_Dreamcast_development#Setting_up_and_compiling_the_toolchain_with_the_dc-chain_script and kos-ports.
+2. Install python3 and meson
 3. Place a Super Mario 64 ROM called `baserom.<VERSION>.z64` into the repository's root directory for asset extraction, where `VERSION` can be `us`, `jp`, or `eu`. **Note: Only US supported**
-4. Run `make TARGET_DC=1 scramble`
-5. This will produce a scrambled binary called `1ST_READ.BIN` ready to be burned onto a cd-r for use in a Dreamcast.
+4. Run `make TARGET_DC=1 cdi`
+5. This will produce a scrambled binary called `sm64.us.f3dex2e.cdi` ready to be burned onto a cd-r for use in a Dreamcast.
 
 **Docker Instructions**
 

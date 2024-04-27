@@ -25,10 +25,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "gl.h"
-#include "glu.h"
-#include "glext.h"
-#include "glkos.h"
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glext.h>
+#include <GL/glkos.h>
 #else
 #define GL_GLEXT_PROTOTYPES 1
 #endif
@@ -83,7 +84,6 @@ static struct SamplerState tmu_state[2];
 
 static const dc_fast_t *cur_buf = NULL;
 static bool gl_blend = false;
-static bool gl_depth = false;
 static bool gl_npot = false;
 
 #if !defined(TARGET_DC)
@@ -120,10 +120,10 @@ static void resample_32bit(const uint32_t *in, const int inwidth, const int inhe
   }
 }
 
-static void resample_16bit(const unsigned short *in, int inwidth, int inheight, unsigned short *out, int outwidth, int outheight) {
+static void resample_16bit(const uint16_t *in, int inwidth, int inheight, uint16_t *out, int outwidth, int outheight) {
     int i, j;
-    const unsigned short *inrow;
-    unsigned int frac, fracstep;
+    const uint16_t *inrow;
+    uint32_t frac, fracstep;
 
     fracstep = inwidth * 0x10000 / outwidth;
     for (i = 0; i < outheight; i++, out += outwidth) {
@@ -389,10 +389,11 @@ static void gfx_opengl_upload_texture(const uint8_t *rgba32_buf, int width, int 
             height = pheight;
         }
     }
+
     if(type == GL_RGBA){
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba32_buf);
     } else {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, rgba32_buf);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB5_A1, width, height, 0, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, rgba32_buf);
     }
 #ifdef DEBUG
     printf("GL Mem left:%u\n", (unsigned int)pvr_mem_available());
@@ -435,8 +436,7 @@ static void gfx_opengl_set_depth_test(bool depth_test) {
 }
 
 static void gfx_opengl_set_depth_mask(bool z_upd) {
-    gl_depth = z_upd;
-    glDepthMask(z_upd);
+    glDepthMask(z_upd ? GL_TRUE : GL_FALSE);
 }
 
 static void gfx_opengl_set_zmode_decal(bool zmode_decal) {
@@ -533,14 +533,15 @@ static void gfx_opengl_draw_triangles(float buf_vbo[], UNUSED size_t buf_vbo_len
         glDisable(GL_BLEND);
     }
 
-    if(cur_shader->shader_id == 18874437){ // 0x1200045, skybox
-        glDepthMask(false);
+    if(cur_shader->shader_id == 0x1200045){ // 0x1200045, skybox
+        //glDepthMask(false);
+        return; // Sky seems to always draw on top?
     }
 
     glDrawArrays(GL_TRIANGLES, 0, 3 * buf_vbo_num_tris);
 
-    if(cur_shader->shader_id == 18874437){ // 0x1200045, skybox
-        glDepthMask(true);
+    if(cur_shader->shader_id == 0x1200045){ // 0x1200045, skybox
+        //glDepthMask(true);
     }
 
     // if there's two textures, draw polys with the second texture
@@ -622,10 +623,10 @@ static void gfx_opengl_init(void) {
     config.autosort_enabled = GL_TRUE;
     config.fsaa_enabled = GL_FALSE;
     /*@Note: These should be adjusted at some point */
-    config.initial_op_capacity = 3584;
-    config.initial_pt_capacity = 1024;
-    config.initial_tr_capacity = 2048;
-    config.initial_immediate_capacity = 0;
+    // config.initial_op_capacity = 3584;
+    // config.initial_pt_capacity = 1024;
+    // config.initial_tr_capacity = 2048;
+    // config.initial_immediate_capacity = 0;
     glKosInitEx(&config);
     //glKosInit();
 

@@ -1,0 +1,3 @@
+[submodule "tools/mkdcdisc"]
+	path = tools/mkdcdisc
+	url = https://gitlab.com/simulant/mkdcdisc

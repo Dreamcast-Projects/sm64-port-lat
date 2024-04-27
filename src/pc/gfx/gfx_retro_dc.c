@@ -22,10 +22,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "gl.h"
-#include "glu.h"
-#include "glext.h"
-#include "glkos.h"
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glext.h>
+#include <GL/glkos.h>
 #include "gl_fast_vert.h"
 #endif
 
@@ -334,7 +334,7 @@ static void import_texture_rgba16(int tile) {
     uint32_t width = rdp.texture_tile.line_size_bytes / 2;
     uint32_t height = rdp.loaded_texture[tile].size_bytes / rdp.texture_tile.line_size_bytes;
     
-    gfx_rapi->upload_texture((uint8_t *)rgba16_buf, width, height, GL_UNSIGNED_SHORT_1_5_5_5_REV);
+    gfx_rapi->upload_texture((uint8_t *)rgba16_buf, width, height, GL_RGB5_A1);
 }
 
 static void import_texture_rgba32(int tile) {

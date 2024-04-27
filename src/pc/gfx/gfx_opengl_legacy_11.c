@@ -132,11 +132,11 @@ static bool gfx_opengl_z_is_from_0_to_1(void) {
 }
 
 static inline GLenum texenv_set_color(UNUSED struct ShaderProgram *prg) {
-    return GL_MODULATE;
+    return GL_REPLACE;
 }
 
 static inline GLenum texenv_set_texture(UNUSED struct ShaderProgram *prg) {
-    return GL_MODULATE;
+    return GL_REPLACE;
 }
 
 static inline GLenum texenv_set_texture_color(struct ShaderProgram *prg) {
@@ -146,10 +146,10 @@ static inline GLenum texenv_set_texture_color(struct ShaderProgram *prg) {
 
     switch (prg->shader_id) {
         case 0x0000038D: // mario's eyes
-        case 0x01045A00: // peach letter
         case 0x01200A00: // intro copyright fade in
             mode = GL_DECAL;
             break;
+        case 0x01045A00: // peach letter, explosions
         case 0x00000551: // goddard
             mode = GL_BLEND;
             break;
