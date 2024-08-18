@@ -8052,23 +8052,23 @@ std::string AudioFormat::description() const
 	std::string d;
 	char s[1024];
 	/* sampleRate, channelCount */
-	sprintf(s, "{ %7.2f Hz %d ch ", sampleRate, channelCount);
+	snprintf(s, sizeof(s), "{ %7.2f Hz %d ch ", sampleRate, channelCount);
 	d += s;
 
 	/* sampleFormat, sampleWidth */
 	switch (sampleFormat)
 	{
 		case AF_SAMPFMT_TWOSCOMP:
-			sprintf(s, "%db 2 ", sampleWidth);
+			snprintf(s, sizeof(s), "%db 2 ", sampleWidth);
 			break;
 		case AF_SAMPFMT_UNSIGNED:
-			sprintf(s, "%db u ", sampleWidth);
+			snprintf(s, sizeof(s), "%db u ", sampleWidth);
 			break;
 		case AF_SAMPFMT_FLOAT:
-			sprintf(s, "flt ");
+			snprintf(s, sizeof(s), "flt ");
 			break;
 		case AF_SAMPFMT_DOUBLE:
-			sprintf(s, "dbl ");
+			snprintf(s, sizeof(s), "dbl ");
 			break;
 		default:
 			assert(false);
@@ -8078,7 +8078,7 @@ std::string AudioFormat::description() const
 	d += s;
 
 	/* pcm */
-	sprintf(s, "(%.30g+-%.30g [%.30g,%.30g]) ",
+	snprintf(s, sizeof(s), "(%.30g+-%.30g [%.30g,%.30g]) ",
 		pcm.intercept, pcm.slope,
 		pcm.minClip, pcm.maxClip);
 	d += s;

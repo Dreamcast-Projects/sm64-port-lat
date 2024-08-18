@@ -696,6 +696,7 @@ UNUSED static void bhv_cmd_set_int_random_from_table(s32 tableSize) {
         table[i] = BHV_CMD_GET_1ST_S16(i + 1);
         table[i + 1] = BHV_CMD_GET_2ND_S16(i + 1);
     }
+}
 
 // Command 0x2A: Loads collision data for the object.
 // Usage: LOAD_COLLISION_DATA(collisionData)
@@ -793,6 +794,8 @@ static s32 bhv_cmd_spawn_water_droplet(void) {
     gCurBhvCommand += 2;
     return BHV_PROC_CONTINUE;
 }
+
+extern u32 gGlobalTimer;
 
 // Command 0x34: Animates an object using texture animation. <field> is always set to oAnimState.
 // Usage: ANIMATE_TEXTURE(field, rate)

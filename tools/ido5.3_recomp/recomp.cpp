@@ -372,7 +372,7 @@ static void link_with_lui(int offset, uint32_t reg, int mem_imm)
 
                         insns[search].id = MIPS_INS_LI;
                         insns[search].mnemonic = "li";
-                        sprintf(buf, "$%s, 0x%x", cs_reg_name(handle, rd), addr);
+                        snprintf(buf, sizeof(buf), "$%s, 0x%x", cs_reg_name(handle, rd), addr);
                         insns[search].op_str = buf;
                         insns[search].operands[1].type = MIPS_OP_IMM;
                         insns[search].operands[1].imm = addr;
@@ -382,7 +382,7 @@ static void link_with_lui(int offset, uint32_t reg, int mem_imm)
                                 insns[offset].id = MIPS_INS_MOVE;
                                 insns[offset].operands[1].type = MIPS_OP_REG;
                                 insns[offset].mnemonic = "move";
-                                sprintf(buf, "$%s, $%s", cs_reg_name(handle, insns[offset].operands[0].reg), cs_reg_name(handle, rd));
+                                snprintf(buf, sizeof(buf), "$%s, $%s", cs_reg_name(handle, insns[offset].operands[0].reg), cs_reg_name(handle, rd));
                                 insns[offset].op_str = buf;
                                 if (addr >= text_vaddr && addr < text_vaddr + text_section_len) {
                                     add_function(addr);
@@ -400,7 +400,7 @@ static void link_with_lui(int offset, uint32_t reg, int mem_imm)
                             case MIPS_INS_LWC1:
                             case MIPS_INS_SWC1:
                                 insns[offset].operands[1].mem.disp = 0;
-                                sprintf(buf, "$%s, ($%s)", cs_reg_name(handle, insns[offset].operands[0].reg), cs_reg_name(handle, rd));
+                                snprintf(buf, sizeof(buf), "$%s, ($%s)", cs_reg_name(handle, insns[offset].operands[0].reg), cs_reg_name(handle, rd));
                                 insns[offset].op_str = buf;
                                 break;
                             default:
@@ -432,7 +432,7 @@ static void link_with_jalr(int offset)
             if (insns[search].id == MIPS_INS_LW || insns[search].id == MIPS_INS_LI) {
                 if (insns[search].is_global_got_memop || insns[search].id == MIPS_INS_LI) {
                     char buf[32];
-                    sprintf(buf, "0x%x", insns[search].linked_value);
+                    snprintf(buf, sizeof(buf), "0x%x", insns[search].linked_value);
                     insns[search].linked_insn = offset;
                     insns[offset].linked_insn = search;
                     insns[offset].linked_value = insns[search].linked_value;
@@ -721,7 +721,7 @@ static void pass1(void) {
                             insns[i].id = MIPS_INS_LI;
                             insns[i].operands[1].imm = dest_vaddr;
                             char buf[32];
-                            sprintf(buf, "$%s, 0x%x", cs_reg_name(handle, insn.operands[0].reg), dest_vaddr);
+                            snprintf(buf, sizeof(buf), "$%s, 0x%x", cs_reg_name(handle, insn.operands[0].reg), dest_vaddr);
                             insns[i].op_str = buf;
                         }
                     }
@@ -741,7 +741,7 @@ static void pass1(void) {
                     insns[i].id = MIPS_INS_LI;
                     insns[i].operands[1].imm = imm;
                     insns[i].mnemonic = "li";
-                    sprintf(buf, "$%s, %" PRIi64, cs_reg_name(handle, rd), imm);
+                    snprintf(buf, sizeof(buf), "$%s, %" PRIi64, cs_reg_name(handle, rd), imm);
                     insns[i].op_str = buf;
                 } else if (/*rd == rs &&*/ rd != MIPS_REG_GP) { // only look for LUI if rd and rs are the same
                     link_with_lui(i, rs, (int)imm);
@@ -755,7 +755,7 @@ static void pass1(void) {
                     link_with_jalr(i);
                     if (insn.linked_insn != -1) {
                         char buf[32];
-                        sprintf(buf, "0x%x", insn.linked_value);
+                        snprintf(buf, sizeof(buf), "0x%x", insn.linked_value);
                         insn.id = MIPS_INS_JAL;
                         insn.mnemonic = "jal";
                         insn.op_str = buf;
